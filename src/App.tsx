@@ -1,6 +1,59 @@
 import React, { useEffect, useMemo, useState } from "react";
 import { LineChart, Line, XAxis, YAxis, Tooltip, CartesianGrid, ResponsiveContainer, Legend } from "recharts";
 
+type Question = {
+  id: string;
+  key: string;
+  label: string;
+  type: "text" | "number" | "select" | "slider" | "textarea" | "time" | "date";
+  min?: number;
+  max?: number;
+  step?: number;
+  options?: string[];
+};
+
+const DEFAULT_QUESTIONS: Question[] = [
+  { id: "date", key: "date", label: "Date", type: "date" },
+  { id: "protocol", key: "protocol", label: "Protocol (e.g., Fadiman, Stamets, custom)", type: "text" },
+  { id: "dayType", key: "dayType", label: "Day Type", type: "select", options: ["Dose", "Transition", "Off"] },
+  { id: "strain", key: "strain", label: "Strain / Variety (optional)", type: "text" },
+  { id: "doseMg", key: "doseMg", label: "Dose (mg)", type: "number", step: 1 },
+  { id: "timeTaken", key: "timeTaken", label: "Time taken", type: "time" },
+  { id: "sleepHours", key: "sleepHours", label: "Sleep last night (hours)", type: "number", step: 0.5 },
+  { id: "caffeineMg", key: "caffeineMg", label: "Caffeine today (mg, optional)", type: "number", step: 10 },
+  { id: "intention", key: "intention", label: "Intention for today", type: "textarea" },
+  { id: "setSetting", key: "setSetting", label: "Set & Setting (where / with whom / mindset)", type: "textarea" },
+  { id: "mood", key: "mood", label: "Mood (1–10)", type: "slider", min: 1, max: 10, step: 1 },
+  { id: "anxiety", key: "anxiety", label: "Anxiety (1–10)", type: "slider", min: 1, max: 10, step: 1 },
+  { id: "focus", key: "focus", label: "Focus (1–10)", type: "slider", min: 1, max: 10, step: 1 },
+  { id: "energy", key: "energy", label: "Energy (1–10)", type: "slider", min: 1, max: 10, step: 1 },
+  { id: "productivity", key: "productivity", label: "Productivity (1–10)", type: "slider", min: 1, max: 10, step: 1 },
+  { id: "creativity", key: "creativity", label: "Creativity (1–10)", type: "slider", min: 1, max: 10, step: 1 },
+  { id: "sociability", key: "sociability", label: "Sociability (1–10)", type: "slider", min: 1, max: 10, step: 1 },
+  { id: "bodyLoad", key: "bodyLoad", label: "Body load / discomfort (1–10)", type: "slider", min: 1, max: 10, step: 1 },
+  { id: "notes", key: "notes", label: "Notes", type: "textarea" }
+];
+
+useEffect(() => {
+  const saved = localStorage.getItem("journal_questions");
+  if (saved) {
+    try {
+      setQuestions(JSON.parse(saved));
+    } catch {
+      setQuestions(DEFAULT_QUESTIONS);
+    }
+  } else {
+    setQuestions(DEFAULT_QUESTIONS);
+  }
+}, []);
+
+useEffect(() => {
+  if (questions.length) {
+    localStorage.setItem("journal_questions", JSON.stringify(questions));
+  }
+}, [questions]);
+
+
 // 👇 paste your actual Apps Script web app URL here
 const SHEET_WEBAPP_URL = import.meta.env.VITE_SHEET_WEBAPP_URL as string;
 console.log("[env] SHEET_WEBAPP_URL:", SHEET_WEBAPP_URL);
