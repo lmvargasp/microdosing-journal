@@ -239,10 +239,8 @@ function QuestionsEditor({ questions, setQuestions }: any) {
 
 // ----------------------------- Main App -----------------------------
 export default function App() {
-  const [questions, setQuestions] = useState(() => {
-    const saved = localStorage.getItem(STORAGE_QUESTIONS_KEY);
-    return saved ? JSON.parse(saved) : DEFAULT_QUESTIONS;
-  });
+  const [questions] = useState<string[]>([]);
+;
 
   const [entries, setEntries] = useState<any[]>(() => {
     const saved = localStorage.getItem(STORAGE_KEY);
@@ -286,45 +284,7 @@ export default function App() {
     setEntries((prev) => prev.filter((e) => e.id !== id));
   }
 
-  function exportCSV() {
-    if (!entries.length) return alert("No entries to export yet.");
-    const csv = toCSV(entries.map(({ id, ...rest }) => rest));
-    const blob = new Blob([csv], { type: "text/csv;charset=utf-8;" });
-    const url = URL.createObjectURL(blob);
-    const a = document.createElement("a");
-    a.href = url;
-    a.download = `microdosing_journal_${new Date().toISOString().slice(0,10)}.csv`;
-    a.click();
-    URL.revokeObjectURL(url);
-  }
-
-  function exportJSON() {
-    if (!entries.length) return alert("No entries to export yet.");
-    const blob = new Blob([JSON.stringify(entries, null, 2)], { type: "application/json" });
-    const url = URL.createObjectURL(blob);
-    const a = document.createElement("a");
-    a.href = url;
-    a.download = `microdosing_journal_${new Date().toISOString().slice(0,10)}.json`;
-    a.click();
-    URL.revokeObjectURL(url);
-  }
-
-  async function handleImportJSON(e: any) {
-    const file = e.target.files?.[0];
-    if (!file) return;
-    try {
-      const data = await parseJSONFile(file);
-      if (!Array.isArray(data)) throw new Error("Invalid JSON format. Expect an array of entries.");
-      const normalized = data.filter((x) => x && typeof x === "object");
-      setEntries((prev) => [...normalized, ...prev]);
-      alert(`Imported ${normalized.length} entries.`);
-      e.target.value = "";
-    } catch (err: any) {
-      alert("Import failed: " + err.message);
-    }
-  }
-
-  const chartData = useMemo(() => {
+    const chartData = useMemo(() => {
     const rows = [...entries].reverse().slice(-30);
     return rows.map((r: any) => ({
       date: r.date || new Date(r.createdAt).toISOString().slice(0, 10),
