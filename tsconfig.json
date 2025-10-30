@@ -1,7 +1,17 @@
 {
   "compilerOptions": {
-    // ...lo que ya tengas...
-    "noUnusedLocals": false,
-    "noUnusedParameters": false
-  }
+    "target": "ES2021",
+    "lib": ["ES2021", "DOM", "DOM.Iterable"],
+    "module": "ESNext",
+    "moduleResolution": "Bundler",
+    "jsx": "react-jsx",
+    "strict": true,
+    "esModuleInterop": true,
+    "skipLibCheck": true,
+    "resolveJsonModule": true,
+    "isolatedModules": true,
+    "noEmit": true,
+    "types": ["vite/client"]
+  },
+  "include": ["src"]
 }
